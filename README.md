@@ -1,7 +1,7 @@
 # FwdLearning
-Tensorflow implementation of Fixed-Weight Meta-Learning
+#Tensorflow implementation of Fixed-Weight Meta-Learning
 
-Experiment Settings:
+#Experiment Settings:
 Run fwd_main.py with your prefered experiment settings.
 Arguments:
 FILE_PATH: The csv file that contains the input to the network. The files are attached in the package.
@@ -39,7 +39,7 @@ min_map max_map: number of timestep in an episode. Recommended to make min_map =
 
 interval: number of episodes. 
 
-Input file:
+#Input file:
 row 1,2: x1 x2 at timestep t.
 
 row 3: label at timestep t-1.
