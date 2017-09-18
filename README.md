@@ -1,5 +1,5 @@
 # FwdLearning
-#Tensorflow implementation of Fixed-Weight Meta-Learning
+*Tensorflow implementation of Fixed-Weight Meta-Learning*
 
 #Experiment Settings:
 Run fwd_main.py with your prefered experiment settings.
