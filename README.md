@@ -1,11 +1,11 @@
 # FwdLearning
-*Tensorflow implementation of Fixed-Weight Meta-Learning*
+_**Tensorflow implementation of Fixed-Weight Meta-Learning**_
 
-#Experiment Settings:
+**Experiment Settings:**
 Run fwd_main.py with your prefered experiment settings.
 Arguments:
-FILE_PATH: The csv file that contains the input to the network. The files are attached in the package.
-savefolder: Folder to save the check point file. For faster training time, we only save the model when it reaches a new best loss.
+*FILE_PATH: The csv file that contains the input to the network. The files are attached in the package.
+*savefolder: Folder to save the check point file. For faster training time, we only save the model when it reaches a new best loss.
 
 LSTM: the architecture. Choice of nfg, cifg, lstm.
 
