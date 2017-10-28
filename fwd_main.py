@@ -50,8 +50,8 @@ def makeFolder(addr):
 
 start_time = str(datetime.now())
 
-FILE_PATH  = "D:/CLS_lab/codeTest/fwl_project/training_data_100m_256e/processed_boolean_16.csv"
-savefolder = "D:\\CLS_lab\\codeTest\\fwl_project\\savefile\\debug_nfg\\"
+FILE_PATH  = "results_with_operator_16_100m_250e.csv"
+savefolder = "C:/Users/FryingNemo/fwd_ckpt/"
 
 LSTM = "nfg" #nfg, cifg, full lstm
 clipped = True
@@ -69,7 +69,7 @@ lr = 0.01
 epoch_threshold = 400
 map_count = 100
 min_map = 128
-max_map = 256
+max_map = 250
 
 interval = 10
 
@@ -320,7 +320,7 @@ with tf.device("/cpu:0"):
     y4 = tf.sigmoid(tf.matmul(y3, W3) + B3, name = "output2")
     loss = tf.reduce_sum(tf.square(tf.subtract(y4, y_)), name = "squared_l")
     loss_ = tf.reduce_sum(tf.subtract(y_, y4), name = "unsigned_l")
-    rms = tf.train.RMSPropOptimizer(learning_rate = lr).minimize(loss)
+    rms = tf.train.RMSPropOptimizer(learning_rate = lr).minimize(loss, name = "update_ops")
     optimizer = rms
     sess = tf.Session()
     init = tf.global_variables_initializer()
@@ -361,7 +361,6 @@ with tf.device("/cpu:0"):
             else:
                 batch = np.append(batch, temp_debug, axis =0)
             last_output, temp_loss  =sess.run([y4,loss_], feed_dict = {_inputs : temp_debug, y_ : temp_label})
-            print(np.shape(temp_debug))
 
             loss_l.append(np.abs(temp_loss) )
             counter = counter + 1
