@@ -43,6 +43,9 @@ import random
 import matplotlib.pyplot as plt
 
 from datetime import datetime
+import json
+plt.rcParams["figure.figsize"] = [16, 9]
+
 
 def makeFolder(addr):
     if not os.path.exists(addr):
@@ -51,7 +54,7 @@ def makeFolder(addr):
 start_time = str(datetime.now())
 
 FILE_PATH  = "results_with_operator_16_100m_250e.csv"
-savefolder = "C:/Users/FryingNemo/fwd_ckpt/"
+savefolder = "C:/Users/FryingNemo/fwd_ckpt/debug/"
 
 LSTM = "nfg" #nfg, cifg, full lstm
 clipped = True
@@ -74,15 +77,46 @@ max_map = 250
 interval = 10
 
 target_map  = max_map
-plt.rcParams["figure.figsize"] = [16, 9]
+holdOut = [2]
+holdOutname = "_".join(str(x) for x in holdOut)
+
+
 
 
 makeFolder(savefolder)
-text_file = open(savefolder + "readme.txt", "w")
-text_file.write("New loss new shuffle clipped 16 nfg")
-text_file.close()
+
+#text_file = open(savefolder + "readme.txt", "w")
+#text_file.write("New loss new shuffle clipped 16 nfg")
+#text_file.close()
 
 
+
+
+config = {
+'holdout' :  holdOutname,
+'topology' : LSTM,
+'clipped' :    clipped,
+'new_shuffle' : new_shuffle,
+'new_loss' : new_loss,
+ "UNROLL" :  16,
+"scaled" : False,
+"noise" : False,
+"cell_count" : 1, 
+"hidden_layer_size" : 24,
+"input_size" : 4,
+"target_size" : 12,
+"num_epoch" : 1,
+"lr" : 0.01,
+"epoch_threshold" : 400,
+"map_count" : 100,
+"min_map" : 128,
+"max_map" : 250,
+"interval" : 10
+   }
+
+
+with open(savefolder + 'readme.txt', 'w') as file:
+     json.dump(config, file)
 
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
@@ -303,10 +337,41 @@ with tf.device("/cpu:0"):
                         data[row_index][cols_index] == 0.9
             row_index+=1
             
+    task_train =  [i for i in range(len(data[-1])) if data[-1][i] not in holdOut]
+    task_test =  [i for i in range(len(data[-1])) if data[-1][i] in holdOut]
+    
+    testFunction = [data[-1][i] for i in range(len(data[-1])) if data[-1][i] in holdOut]
+    
+    
     INPUT = data[0:2]
-    LABEL = data[-1:]
-    LABEL = np.transpose(LABEL)
+    LABEL = data[-2]
+    
+    testLABEL = LABEL[:][task_test]
+    
+    
+
     INPUT = np.transpose(INPUT)
+    
+    testINPUT = INPUT[:]
+    
+    
+    LABEL = LABEL[task_train]
+    LABEL = np.transpose([LABEL])
+    
+    INPUT = INPUT[task_train]
+    
+    testINPUT = testINPUT[task_test]
+    testINPUT = testINPUT.T.tolist()
+    
+    testINPUT.append(testLABEL)
+    testINPUT.append(testFunction)
+    
+    writeRows(savefolder + "holdout" + holdOutname + '.csv' , testINPUT)
+    
+    
+    map_count = int(len(INPUT) / max_map)
+    
+    
     input = list(chunks(INPUT, max_map))
     label = list(chunks(LABEL, max_map))
     rnn = LSTM_layer(cell_count, input_size, hidden_layer_size, target_size)
