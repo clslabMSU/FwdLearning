@@ -67,7 +67,7 @@ cell_count = 1
 hidden_layer_size = 24
 input_size = 4
 target_size = 12
-num_epoch = 1000
+num_epoch = 2000
 lr = 0.01
 epoch_threshold = 1000
 map_count = 100
@@ -98,20 +98,20 @@ config = {
 'clipped' :    clipped,
 'new_shuffle' : new_shuffle,
 'new_loss' : new_loss,
- "UNROLL" :  16,
+ "UNROLL" :  UNROLL,
 "scaled" : False,
 "noise" : False,
-"cell_count" : 1, 
-"hidden_layer_size" : 24,
-"input_size" : 4,
-"target_size" : 12,
-"num_epoch" : 1,
-"lr" : 0.01,
-"epoch_threshold" : 400,
-"map_count" : 100,
-"min_map" : 128,
-"max_map" : 250,
-"interval" : 10
+"cell_count" : cell_count, 
+"hidden_layer_size" : hidden_layer_size,
+"input_size" : input_size,
+"target_size" : target_size,
+"num_epoch" : num_epoch,
+"lr" : lr,
+"epoch_threshold" : epoch_threshold,
+"map_count" : map_count,
+"min_map" : min_map,
+"max_map" : max_map,
+"interval" : interval
    }
 
 
