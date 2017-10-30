@@ -243,7 +243,7 @@ with tf.device("/cpu:0"):
                 all_best_loss.append(best_loss)
             if new_loss:
                 LABEL = [ LABEL[i] for i in range(len(LABEL)) if i% target_map > interval]
-            sess.run("update_ops:0",  feed_dict = {"inputs:0" : batch, "label:0" : LABEL})
+            sess.run("update_ops",  feed_dict = {"inputs:0" : batch, "label:0" : LABEL})
     
         saver0.save(sess, savefolder + "best/model.ckpt",  global_step = epoch_i + loadckpt , write_meta_graph= False)
     
