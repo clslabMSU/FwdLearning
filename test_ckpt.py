@@ -19,10 +19,10 @@ import matplotlib.pyplot as plt
 from fileOP import writeRows
 
 
-FILE_PATH  = "C:\\savefile\\partial\\2_8\\holdout2_8.csv"
-folder = "C:\\savefile\\partial\\2_8\\"
+FILE_PATH  = "C:\\savefile\\partial\\15_9_contcont\\holdout15_9.csv"
+folder = "C:\\savefile\\partial\\15_9_contcont\\"
 UNROLL = 40
-chkpt = 1716
+chkpt = 2852
 
 tf.reset_default_graph()
 data_peak = np.recfromcsv(FILE_PATH, delimiter = ',') # peak through data to see number of rows and cols
