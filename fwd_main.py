@@ -54,7 +54,7 @@ def makeFolder(addr):
 start_time = str(datetime.now())
 
 FILE_PATH  = "results_with_operator_16_100m_250e.csv"
-savefolder = "C:/savefile/partial/15_9/"
+savefolder = "C:/savefile/partial/2_8/"
 
 LSTM = "nfg" #nfg, cifg, full lstm
 clipped = True
@@ -77,7 +77,8 @@ max_map = 250
 interval = 10
 
 target_map  = max_map
-holdOut = [15,9]
+holdOut = [2,8
+           ]
 holdOutname = "_".join(str(x) for x in holdOut)
 
 

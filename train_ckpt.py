@@ -54,8 +54,8 @@ def makeFolder(addr):
 start_time = str(datetime.now())
 
 FILE_PATH  = "results_with_operator_16_100m_250e.csv"
-loadfolder = "C:\\savefile\\partial\\15_9\\"
-savefolder = "C:/savefile/partial/15_9_cont/"
+loadfolder = "C:\\savefile\\partial\\15_9_cont\\"
+savefolder = "C:/savefile/partial/15_9_contcont/"
 
 LSTM = "nfg" #nfg, cifg, full lstm
 clipped = True
@@ -68,7 +68,7 @@ cell_count = 1
 hidden_layer_size = 24
 input_size = 4
 target_size = 12
-num_epoch = 2000
+num_epoch = 20000
 lr = 0.01
 epoch_threshold = 1000
 map_count = 100
@@ -82,7 +82,7 @@ holdOut = [15,9]
 holdOutname = "_".join(str(x) for x in holdOut)
 
 
-loadckpt = 1000
+loadckpt = 2631
 
 makeFolder(savefolder)
 tf.reset_default_graph()
@@ -188,6 +188,7 @@ with tf.device("/cpu:0"):
         print("OKAY")
          
         saver0 = tf.train.Saver(max_to_keep = None)
+        saver0.export_meta_graph(savefolder + "lr" + str(lr) + 'rms' + 'unroll' + str(UNROLL) + '.meta')
         
     
         cell_output =  []
@@ -245,7 +246,7 @@ with tf.device("/cpu:0"):
                 LABEL = [ LABEL[i] for i in range(len(LABEL)) if i% target_map > interval]
             sess.run("update_ops",  feed_dict = {"inputs:0" : batch, "label:0" : LABEL})
     
-        saver0.save(sess, savefolder + "best/model.ckpt",  global_step = epoch_i + loadckpt , write_meta_graph= False)
+        saver0.save(sess, savefolder + "best/model.ckpt",  global_step = epoch_i + loadckpt + 1 , write_meta_graph= False)
     
         writeRows(savefolder + "best_error.csv", np.transpose([all_best_loss]))
         writeRows(savefolder + "all_error.csv", np.transpose([all_loss]))
