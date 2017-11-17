@@ -54,9 +54,9 @@ def makeFolder(addr):
 start_time = str(datetime.now())
 
 FILE_PATH  = "results_with_operator_16_100m_250e.csv"
-savefolder = "C:/savefile/partial/2_8/"
+savefolder = "C:/savefile/partial/gru_15_9/"
 
-LSTM = "nfg" #nfg, cifg, full lstm
+LSTM = "gru" #nfg, cifg, full lstm
 clipped = True
 new_shuffle = True
 new_loss = True
@@ -77,8 +77,7 @@ max_map = 250
 interval = 10
 
 target_map  = max_map
-holdOut = [2,8
-           ]
+holdOut = [15,9]
 holdOutname = "_".join(str(x) for x in holdOut)
 
 
@@ -288,6 +287,104 @@ with tf.device("/cpu:0"):
             all_outputs = tf.map_fn(self.get_output, all_hidden_states)
     
             return all_outputs
+    
+    class RNN_cell(object):
+    
+        """
+        RNN cell object which takes 3 arguments for initialization.
+        input_size = Input Vector size
+        hidden_layer_size = Hidden layer size
+        target_size = Output vector size
+        """
+    
+        def __init__(self, input_size, hidden_layer_size, target_size):
+    
+            # Initialization of given values
+            self.input_size = input_size
+            self.hidden_layer_size = hidden_layer_size
+            self.target_size = target_size
+    
+            # Weights for input and hidden tensor
+            self.Wx = tf.Variable(
+                tf.zeros([self.input_size, self.hidden_layer_size]))
+            self.Wr = tf.Variable(
+                tf.zeros([self.input_size, self.hidden_layer_size]))
+            self.Wz = tf.Variable(
+                tf.zeros([self.input_size, self.hidden_layer_size]))
+    
+            self.br = tf.Variable(tf.truncated_normal(
+                [self.hidden_layer_size], mean=1))
+            self.bz = tf.Variable(tf.truncated_normal(
+                [self.hidden_layer_size], mean=1))
+    
+            self.Wh = tf.Variable(
+                tf.zeros([self.hidden_layer_size, self.hidden_layer_size]))
+    
+            # Weights for output layer
+            self.Wo = tf.Variable(tf.truncated_normal(
+                [self.hidden_layer_size, self.target_size], mean=1, stddev=.01))
+            self.bo = tf.Variable(tf.truncated_normal(
+                [self.target_size], mean=1, stddev=.01))
+            # Placeholder for input vector with shape[batch, seq, embeddings]
+    
+            # Processing inputs to work with scan function
+            self.processed_input = process_batch_input_for_RNN(_inputs)
+    
+    
+    
+            self.initial_hidden = _inputs[:, 0, :]
+            self.initial_hidden = tf.matmul(
+                self.initial_hidden, tf.zeros([input_size, hidden_layer_size]))
+    
+        # Function for GRU cell
+        def Gru(self, previous_hidden_state, x):
+            """
+            GRU Equations
+            """
+            z = tf.sigmoid(tf.matmul(x, self.Wz) + self.bz)
+            r = tf.sigmoid(tf.matmul(x, self.Wr) + self.br)
+    
+            h_ = tf.tanh(tf.matmul(x, self.Wx) +
+                         tf.matmul(previous_hidden_state, self.Wh) * r)
+    
+            current_hidden_state = tf.multiply(
+                (1 - z), h_) + tf.multiply(previous_hidden_state, z)
+    
+            return current_hidden_state
+    
+        # Function for getting all hidden state.
+        def get_states(self):
+            """
+            Iterates through time/ sequence to get all hidden state
+            """
+    
+            # Getting all hidden state throuh time
+            all_hidden_states = tf.scan(self.Gru,
+                                        self.processed_input,
+                                        initializer=self.initial_hidden,
+                                        name='states')
+    
+            return all_hidden_states
+    
+        # Function to get output from a hidden layer
+        def get_output(self, hidden_state):
+            """
+            This function takes hidden state and returns output
+            """
+            output = tf.nn.sigmoid(tf.matmul(hidden_state, self.Wo) + self.bo)
+    
+            return output
+    
+        # Function for getting all output layers
+        def get_outputs(self):
+            """
+            Iterating through hidden states to get outputs for all timestamp
+            """
+            all_hidden_states = self.get_states()
+    
+            all_outputs = tf.map_fn(self.get_output, all_hidden_states)
+    
+            return all_outputs
         
     def process_batch_input_for_RNN(batch_input):
         """
@@ -299,14 +396,18 @@ with tf.device("/cpu:0"):
         return X
 
     class LSTM_layer(object):
-        def __init__(self, cell_count ,input_size, hidden_layer_size, target_size):
+        def __init__(self, cell_count ,input_size, hidden_layer_size, target_size, topo):
             self.input_size = input_size
             self.hidden_layer_size = hidden_layer_size
             self.target_size = target_size
             self.cell_count = cell_count
             self.LSTM_list = []
-            for i in range(self.cell_count):
-                self.LSTM_list.append(LSTM_cell(self.input_size, self.hidden_layer_size, self.target_size))
+            if topo != "gru":
+                for i in range(self.cell_count):
+                    self.LSTM_list.append(LSTM_cell(self.input_size, self.hidden_layer_size, self.target_size))
+            else:
+                for i in range(self.cell_count):
+                    self.LSTM_list.append(RNN_cell(self.input_size, self.hidden_layer_size, self.target_size))
                 
         def output(self):
             output = []
@@ -375,7 +476,7 @@ with tf.device("/cpu:0"):
     
     input = list(chunks(INPUT, max_map))
     label = list(chunks(LABEL, max_map))
-    rnn = LSTM_layer(cell_count, input_size, hidden_layer_size, target_size)
+    rnn = LSTM_layer(cell_count, input_size, hidden_layer_size, target_size,topo = LSTM)
     outputs = rnn.output()
     W2 = tf.Variable(tf.random_uniform([1,cell_count *target_size,6], minval = 0, maxval = 1), name = "Weight2")
     W3 = tf.Variable(tf.random_uniform([ 1, 6,1], minval = 0, maxval = 1), name = "Weight3")
