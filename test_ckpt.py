@@ -19,10 +19,10 @@ import matplotlib.pyplot as plt
 from fileOP import writeRows
 
 
-FILE_PATH  = "C:\\savefile\\partial\\2_15\\holdout2_15.csv"
-folder = "C:\\savefile\\partial\\2_15\\"
+FILE_PATH  = "\\\\EGR-1L11QD2\\CLS_lab\\codeTest\\fwl_project\\quadratic_data\\test data\\quadratic_data_3rows_100m_128e.csv"
+folder = "C:\\savefile\\quad_response_001\\"
 UNROLL = 40
-chkpt = 2360
+chkpt = 20870
 
 tf.reset_default_graph()
 data_peak = np.recfromcsv(FILE_PATH, delimiter = ',') # peak through data to see number of rows and cols
@@ -53,7 +53,7 @@ counter = 0
 temp_debug = np.array([], ndmin = 3)
 with tf.device("/cpu:0"):
     with tf.Session() as sess:
-      tf_saver = tf.train.import_meta_graph(folder + "lr0.01rmsunroll" + str(UNROLL) + ".meta")
+      tf_saver = tf.train.import_meta_graph(folder + "lr0.001rmsunroll" + str(UNROLL) + ".meta")
       tf_saver.restore(sess,  folder + "best\\model.ckpt-" + str(chkpt))  
       for _ in range(len(INPUT)):
           temp_ =  INPUT[counter]

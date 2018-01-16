@@ -53,9 +53,9 @@ def makeFolder(addr):
 
 start_time = str(datetime.now())
 
-FILE_PATH  = "results_with_operator_16_100m_250e.csv"
-loadfolder = "C:\\savefile\\partial\\15_9_cont\\"
-savefolder = "C:/savefile/partial/15_9_contcont/"
+FILE_PATH  = "\\\\EGR-1L11QD2\\CLS_lab\\codeTest\\fwl_project\\quadratic_data\\processed_boolean_16.csv"
+loadfolder = "C:\\savefile\\quad_response_01\\"
+savefolder = "C:\\savefile\\quad_response_01_cont\\"
 
 LSTM = "nfg" #nfg, cifg, full lstm
 clipped = True
@@ -73,7 +73,8 @@ lr = 0.01
 epoch_threshold = 1000
 map_count = 100
 min_map = 128
-max_map = 250
+max_map = 200
+
 
 interval = 10
 
@@ -82,7 +83,7 @@ holdOut = [15,9]
 holdOutname = "_".join(str(x) for x in holdOut)
 
 
-loadckpt = 2631
+loadckpt = 19092
 
 makeFolder(savefolder)
 tf.reset_default_graph()
@@ -135,7 +136,7 @@ with tf.device("/cpu:0"):
     testFunction = [data[-1][i] for i in range(len(data[-1])) if data[-1][i] in holdOut]
     
     INPUT = data[0:2]
-    LABEL = data[-2]
+    LABEL = data[-1]
     testLABEL = LABEL[:][task_test]
     INPUT = np.transpose(INPUT)
     testINPUT = INPUT[:]
